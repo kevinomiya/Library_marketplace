@@ -1,12 +1,9 @@
-
 module library_markketplace::library_markketplace {
 
-    use sui::event;
     use sui::sui::SUI;
     use sui::url::{Self, Url};
     use std::string::{Self, String};
     use sui::coin::{Self, Coin};
-    // use sui::object::{Self, UID};
     use sui::balance::{Self, Balance};
 
     const Error_Not_Librarian: u64 = 1;
@@ -28,13 +25,11 @@ module library_markketplace::library_markketplace {
         book_count: u64
 	}
 
- 
     public struct LibrarianCapability has key {
         id: UID,
         library: ID,
     }
 
- 
     public struct Book has store {
 		id: u64,
 		title: String,
@@ -53,42 +48,6 @@ module library_markketplace::library_markketplace {
         library_id: ID, 
         book_id: u64
     }
-
-    public struct LibraryCreated has copy, drop {
-        library_id: ID,
-        librarian_cap_id: ID,
-    }
-
-    public struct BookAdded has copy, drop {
-        library_id: ID,
-        book: u64,
-    }
-
-    public struct BookRented has copy, drop {
-        library_id: ID,
-        book_id: u64,
-        quantity: u64,
-        renter: address,
-    }
-
-    // Implement for return book event function
-    public struct BookReturned has copy, drop {
-        library_id: ID,
-        book_id: u64,
-        quantity: u64,
-        renter: address,
-    }
-    public struct BookUnlisted has copy, drop {
-        library_id: ID,
-        book_id: u64
-    }
-
-    public struct LibraryWithdrawal has copy, drop {
-        library_id: ID,
-        amount: u64,
-        recipient: address
-    }
-  
 
     // Implement for create library function
     public fun create_library(recipient: address, ctx: &mut TxContext) {
@@ -111,12 +70,7 @@ module library_markketplace::library_markketplace {
             balance: balance::zero<SUI>(),
             books: vector::empty(),
             book_count: 0,
-        });
-
-        event::emit(LibraryCreated{
-           library_id, 
-           librarian_cap_id
-        })
+        }); 
     }
 
     // Implement for add book function
@@ -152,13 +106,7 @@ module library_markketplace::library_markketplace {
 
         library.books.push_back(book);
         library.book_count = library.book_count + 1;
-
-        event::emit(BookAdded{
-            library_id: librarian_cap.library,
-            book: book_id
-        });
     }
-
 
     // Implement for unlist book function
     public fun unlist_book(
@@ -171,11 +119,6 @@ module library_markketplace::library_markketplace {
 
         let book = &mut library.books[book_id];
         book.listed = false;
-
-        event::emit(BookUnlisted{
-            library_id: object::uid_to_inner(&library.id),
-            book_id: book_id
-        });
     }
 
     // Implement for rent book function
@@ -219,13 +162,6 @@ module library_markketplace::library_markketplace {
             i = i+1;
         };
 
-        event::emit(BookRented {
-            library_id: object::uid_to_inner(&library.id),
-            book_id: book_id,
-            quantity: quantity,
-            renter: renter,
-        });
-
         if (book.available == 0 ) {
            unlist_book(library, librarian_cap, book_id);
         }
@@ -246,15 +182,6 @@ module library_markketplace::library_markketplace {
         let book = &mut library.books[rented_book.book_id];
         book.available = book.available + 1;
 
-       
-
-        event::emit(BookReturned {
-            library_id: object::uid_to_inner(&library.id),
-            book_id: rented_book.book_id,
-            quantity: 1,
-            renter: renter,
-        });
-
         if (book.available >= 1) {
             vector::borrow_mut(&mut library.books, rented_book.book_id).listed = true;
         }
@@ -274,12 +201,6 @@ module library_markketplace::library_markketplace {
         let take_coin = coin::take(&mut library.balance, amount, ctx);
         
         transfer::public_transfer(take_coin, recipient);
-        
-        event::emit(LibraryWithdrawal{
-            library_id: object::uid_to_inner(&library.id),
-            amount: amount,
-            recipient: recipient
-        });
     }
 
     // withdraw all the balance from the library
@@ -322,8 +243,6 @@ module library_markketplace::library_markketplace {
             book.available
         )
     }
-
-
     // getter for the rented book details with the rented book id
     public fun get_rented_book_details(rented_book: &RentedBook) : (&UID, ID, u64) {
         (
@@ -332,10 +251,4 @@ module library_markketplace::library_markketplace {
             rented_book.book_id
         )
     }
-
-    // Update the renter of the rented book
-    public fun update_rented_book_renter(rented_book: &mut BookRented, renter: address) {
-        rented_book.renter = renter;
-    }
-
 }
