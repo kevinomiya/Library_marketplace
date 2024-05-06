@@ -8,15 +8,9 @@ module library_markketplace::library_markketplace {
     use sui::dynamic_field as df;
     use sui::dynamic_object_field as dof;
 
-    const Error_Not_Librarian: u64 = 1;
-    const Error_Invalid_WithdrawalAmount: u64 = 2; //  invalid withdrawal amount
-    const Error_Invalid_Quantity: u64 = 3; //  invalid quantity
-    const Error_Insufficient_Payment: u64 = 4; // insufficient payment
-    const Error_Invalid_BookId: u64 = 5; // invalid item id
-    const Error_Invalid_Price: u64 = 6; //  invalid price
-    const Error_Invalid_Supply: u64 = 7; // invalid supply
-    const Error_BookIsNotListed: u64 = 8; // item is not listed
-    const Error_Not_Renter: u64 = 9; // not the renter
+    const Error_Not_Librarian: u64 = 0;
+    const Error_Invalid_BookId: u64 = 1; // invalid item id
+    const Error_Not_Renter: u64 = 2; // not the renter
 
 
 	public struct Library has key {
@@ -135,90 +129,7 @@ module library_markketplace::library_markketplace {
         coin::put(&mut self.balance, payment);
         inner
     }
-    // // Implement for return book function
-    // public fun return_book(
-    //     library: &mut Library,
-    //     rented_book: &RentedBook,
-    //     renter: address,
-    //     ctx: &mut TxContext
-    // ) {
-    //     assert!(rented_book.library_id == object::uid_to_inner(&library.id), Error_Invalid_BookId);
-    //     assert!(rented_book.book_id <= library.books.length(), Error_Invalid_BookId);
-    //     assert!(tx_context::sender(ctx) == renter, Error_Not_Renter);
-
-    //     let book = &mut library.books[rented_book.book_id];
-    //     book.available = book.available + 1;
-
-    //     if (book.available >= 1) {
-    //         vector::borrow_mut(&mut library.books, rented_book.book_id).listed = true;
-    //     }
-    // }
-
-    // // Implement for withdraw from library function
-    // public fun withdraw_from_library(
-    //     library: &mut Library,
-    //     librarian_cap: &LibrarianCapability,
-    //     amount: u64,
-    //     recipient: address,
-    //     ctx: &mut TxContext
-    // ) {
-    //     assert!(library.librarian_cap == object::uid_to_inner(&librarian_cap.id), Error_Not_Librarian);
-    //     assert!(amount > 0 && amount <= library.balance.value(), Error_Invalid_WithdrawalAmount);
-
-    //     let take_coin = coin::take(&mut library.balance, amount, ctx);
-        
-    //     transfer::public_transfer(take_coin, recipient);
-    // }
-
-    // // withdraw all the balance from the library
-    // public fun withdraw_all_from_library(
-    //     library: &mut Library,
-    //     librarian_cap: &LibrarianCapability,
-    //     ctx: &mut TxContext
-    // ) : Coin<SUI> {
-    //     assert!(library.librarian_cap == object::uid_to_inner(&librarian_cap.id), Error_Not_Librarian);
-    //     let amount = library.balance.value();
-    //     let take_coin = coin::take(&mut library.balance, amount, ctx);
-    //     take_coin
     
-    
-    // }
-    // // getter for the library details
-    //     public fun get_library_details(library: &Library) : (&UID, ID, &Balance<SUI>, &vector<Book>, u64) {
-    //         (
-    //             &library.id, 
-    //             library.librarian_cap,
-    //             &library.balance, 
-    //             &library.books, 
-    //             library.book_count
-    //         )
-    //     }
-    
-    // // getter for a book details with the book id
-    // public fun get_book_details(library: &Library, book_id: u64) : (u64, String, String, String, u64, Url, bool, u8, u64, u64) {
-    //     let book = &library.books[book_id];
-    //     (
-    //         book.id,
-    //         book.title,
-    //         book.author,
-    //         book.description,
-    //         book.price,
-    //         book.url,
-    //         book.listed,
-    //         book.category,
-    //         book.total_supply,
-    //         book.available
-    //     )
-    // }
-    // // getter for the rented book details with the rented book id
-    // public fun get_rented_book_details(rented_book: &RentedBook) : (&UID, ID, u64) {
-    //     (
-    //         &rented_book.id,
-    //         rented_book.library_id,
-    //         rented_book.book_id
-    //     )
-    // }
-
     public fun withdraw(
         self: &mut Library, cap: &LibrarianCapability, amount: u64, ctx: &mut TxContext
     ): Coin<SUI> {
