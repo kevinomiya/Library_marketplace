@@ -1,17 +1,14 @@
-module library_markketplace::library_markketplace {
+module library_markketplace::market {
 
     use sui::sui::SUI;
     use sui::url::{Self, Url};
-    use std::string::{Self, String};
+    use std::string::{String};
     use sui::coin::{Self, Coin};
     use sui::balance::{Self, Balance};
     use sui::dynamic_field as df;
     use sui::dynamic_object_field as dof;
 
     const Error_Not_Librarian: u64 = 0;
-    const Error_Invalid_BookId: u64 = 1; // invalid item id
-    const Error_Not_Renter: u64 = 2; // not the renter
-
 
 	public struct Library has key {
 		id: UID,
