@@ -286,20 +286,14 @@ module library_markketplace::library_markketplace {
     public fun withdraw_all_from_library(
         library: &mut Library,
         librarian_cap: &LibrarianCapability,
-        recipient: address,
         ctx: &mut TxContext
-    ) {
+    ) : Coin<SUI> {
         assert!(library.librarian_cap == object::uid_to_inner(&librarian_cap.id), Error_Not_Librarian);
         let amount = library.balance.value();
         let take_coin = coin::take(&mut library.balance, amount, ctx);
-        
-        transfer::public_transfer(take_coin, recipient);
-        
-        event::emit(LibraryWithdrawal{
-            library_id: object::uid_to_inner(&library.id),
-            amount: amount,
-            recipient: recipient
-        });
+        take_coin
+    
+    
     }
     // getter for the library details
         public fun get_library_details(library: &Library) : (&UID, ID, &Balance<SUI>, &vector<Book>, u64) {
