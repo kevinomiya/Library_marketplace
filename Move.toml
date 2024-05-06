@@ -8,3 +8,5 @@ Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-fram
 
 [addresses]
 library_markketplace = "0x0"
+std = "0x1"
+sui = "0x2"
