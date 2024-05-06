@@ -41,13 +41,7 @@ module library_markketplace::library_markketplace {
     public struct Listing has store, copy, drop { id: ID, is_exclusive: bool }
 
     public struct Item has store, copy, drop { id: ID }
-
-    public struct RentedBook has key {
-        id: UID,
-        library_id: ID, 
-        book_id: u64
-    }
-
+    
     // Implement for create library function
     public fun create_library(recipient: address, ctx: &mut TxContext) {
         let library_uid = object::new(ctx); 
@@ -70,9 +64,9 @@ module library_markketplace::library_markketplace {
     }
 
     public fun mint( 
-        title: vector<u8>, 
-        author: vector<u8>,
-        description: vector<u8>,
+        title: String, 
+        author: String,
+        description: String,
         url: vector<u8>, // display for the book
         price: u64,
         supply: u64,
@@ -83,9 +77,9 @@ module library_markketplace::library_markketplace {
        let id = object::new(ctx);
        let book = Book{
             id: id,
-            title: string::utf8(title),
-            author: string::utf8(author),
-            description: string::utf8(description),
+            title: title,
+            author: author,
+            description: description,
             price: price,
             url: url::new_unsafe_from_bytes(url),
             listed: true,
@@ -129,7 +123,7 @@ module library_markketplace::library_markketplace {
         coin::put(&mut self.balance, payment);
         inner
     }
-    
+
     public fun withdraw(
         self: &mut Library, cap: &LibrarianCapability, amount: u64, ctx: &mut TxContext
     ): Coin<SUI> {
