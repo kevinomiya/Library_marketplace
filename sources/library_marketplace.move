@@ -135,58 +135,6 @@ module library_markketplace::library_markketplace {
         coin::put(&mut self.balance, payment);
         inner
     }
-
-
-
-
-
-    // // Implement for rent book function
-    // public fun rent_book(
-    //     library: &mut Library,
-    //     librarian_cap: &LibrarianCapability,
-    //     book_id: u64,
-    //     quantity: u64,
-    //     renter: address,
-    //     payment_coin: &mut Coin<SUI>,
-    //     ctx: &mut TxContext
-    // ) {
-    //     assert!(book_id <= library.books.length(), Error_Invalid_BookId);
-    //     assert!(quantity > 0, Error_Invalid_Quantity);
-
-    //     let book = &mut library.books[book_id];
-    //     assert!(book.available >= quantity, Error_Invalid_Quantity);
-
-    //     let value = payment_coin.value();
-    //     let total_price = book.price * quantity;
-    //     assert!(value >= total_price, Error_Insufficient_Payment);
-
-    //     assert!(book.listed == true, Error_BookIsNotListed);
-
-    //     book.available = book.available - quantity;
-
-    //     let paid = payment_coin.split(total_price, ctx);
-
-    //     coin::put(&mut library.balance, paid);
-
-    //     let mut i = 0_u64;
-
-    //     while (i < quantity) {
-    //         let rented_book_uid = object::new(ctx);
-
-    //         transfer::transfer(RentedBook {
-    //             id: rented_book_uid,
-    //             library_id: object::uid_to_inner(&library.id),
-    //             book_id: book_id }, renter);
-
-    //         i = i+1;
-    //     };
-
-    //     if (book.available == 0 ) {
-    //        unlist_book(library, librarian_cap, book_id);
-    //     }
-    // }
-    
-
     // // Implement for return book function
     // public fun return_book(
     //     library: &mut Library,
@@ -270,6 +218,13 @@ module library_markketplace::library_markketplace {
     //         rented_book.book_id
     //     )
     // }
+
+    public fun withdraw(
+        self: &mut Library, cap: &LibrarianCapability, amount: u64, ctx: &mut TxContext
+    ): Coin<SUI> {
+        assert!(object::id(self) == cap.library, Error_Not_Librarian);
+        coin::take(&mut self.balance, amount, ctx)
+    }
 
     public fun place_internal<T: key + store>(self: &mut Library, item: T) {
         self.book_count = self.book_count + 1;
