@@ -1,4 +1,4 @@
-module library_markketplace::library_markketplace {
+module library_marketplace::library_markketplace {
 
     use sui::event;
     use sui::sui::SUI;
