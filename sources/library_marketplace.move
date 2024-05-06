@@ -181,6 +181,7 @@ module library_markketplace::library_markketplace {
     // Implement for rent book function
     public fun rent_book(
         library: &mut Library,
+        librarian_cap: &LibrarianCapability,
         book_id: u64,
         quantity: u64,
         renter: address,
@@ -226,12 +227,7 @@ module library_markketplace::library_markketplace {
         });
 
         if (book.available == 0 ) {
-            event::emit(BookUnlisted{
-                library_id: object::uid_to_inner(&library.id),
-                book_id: book_id,
-            });
-
-            vector::borrow_mut(&mut library.books, book_id).listed = false;
+           unlist_book(library, librarian_cap, book_id);
         }
     }
     
